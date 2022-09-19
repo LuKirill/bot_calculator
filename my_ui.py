@@ -1,9 +1,12 @@
-import re
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from datetime import datetime
 
 
-def logs_files(num):
-    with open("logs_file.txt", "a", encoding="utf-8") as f:
-        f.write(f"{str(num)}\n")
+async def log(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    with open('log_file.csv', "a", encoding="utf-8") as file:
+        file.write(f'{update.effective_user.first_name}, {update.effective_user.id}, {update.message.text}, /'
+                   f'{datetime.now().strftime("%d/%m/%y %H:%M")}\n')
 
 
 def write_line(a):
@@ -13,46 +16,3 @@ def write_line(a):
 
 def in_txt(a):
     return input(a)
-
-
-class OwnError(Exception):
-    def __init__(self, txt):
-        self.txt = txt
-
-
-def in_comp(a):
-    i = 0
-    while i == 0:
-        inp_data = in_txt(a)
-        comp_reg = re.fullmatch(r'\d+|[+-]*\s*\d+\s*[+-]\s*\d+[i]|[+-]*\s*\d+[i]\s*[+-]\s*\d+', inp_data)
-        try:
-            if not comp_reg:
-                raise OwnError("Неверно записано комплексное число")
-        except OwnError as err:
-            write_line(err)
-        else:
-            return inp_data
-
-
-def in_int(a):
-    i = 0
-    while i == 0:
-        inp_data = in_txt(a)
-        try:
-            inp_data = int(inp_data)
-            if inp_data < 0:
-                raise OwnError("Вы ввели отрицательное число!")
-        except ValueError:
-            write_line("Вы ввели не число")
-        except OwnError as err:
-            write_line(err)
-        else:
-            return inp_data
-
-
-def in_act():
-    act_list = ['-', '+', '*', '/']
-    act = in_txt("Выберите действие: '+', '-', '*', '/': ")
-    while act not in act_list:
-        act = in_txt("Выберите действие: '+', '-', '*', '/': ")
-    return act
